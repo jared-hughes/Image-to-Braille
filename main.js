@@ -25,20 +25,27 @@ function setUIElement(selector, value) {
 
 function initUI() {
 	document.body.ondragover = (e) => e.preventDefault();
-	document.body.ondrop = (e) => {
+	document.body.ondrop = async (e) => {
 		e.preventDefault();
-		loadNewImage(URL.createObjectURL(e.dataTransfer.items[0].getAsFile()));
+		for (let file of e.dataTransfer.files) {
+			await loadNewImage(URL.createObjectURL(file))
+		}
 	}
-	document.body.onpaste = (e) => {
-		event.preventDefault();
-		loadNewImage(URL.createObjectURL(e.clipboardData.items[0].getAsFile()));
+	document.body.onpaste = async (e) => {
+		e.preventDefault();
+		for (let file of e.clipboardData.files) {
+			await loadNewImage(URL.createObjectURL(file))
+		}
 	}
 
 	//buttons
 	const r = () => parseCanvas(settings.last_canvas); //shorten for compactness
 
-	document.querySelector('input[type="file"]').onchange = (e) => {
-		 loadNewImage(URL.createObjectURL(e.target.files[0]));
+	document.querySelector('input[type="file"]').onchange = async (e) => {
+		console.log(e.target)
+		for (let file of e.target.files) {
+			await loadNewImage(URL.createObjectURL(file));
+		}
 	}
 
 	setUIElement('#darktheme', settings.inverted).onchange = (e) => {
@@ -81,7 +88,7 @@ async function loadNewImage(src) {
 
 async function parseCanvas(canvas) {
 	const text = canvasToText(canvas);
-	document.querySelector('#text').value = text;
+	document.querySelector('#text').value += text;
 	document.querySelector('#charcount').innerText = text.length;
 }
 
